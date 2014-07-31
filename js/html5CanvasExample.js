@@ -216,14 +216,12 @@ CanvasApp.prototype =
         this.clear();
         this.setTitle( "MouseEvent test" );
         
-        this.canvas.addEventListener( "onclick", 
+        this.canvas.addEventListener( "click", 
             function( e )
             {
                 console.log( e );
             }
         );
-        
-        console.log( "test", this.canvas.addEventListener );
     },
 }
 
