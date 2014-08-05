@@ -219,9 +219,13 @@ CanvasApp.prototype =
         this.canvas.addEventListener( "click", 
             function( e )
             {
-                console.log( e );
+                console.log( e, e.clientX, e.clientY );
             }
         );
+        
+        var r = this.canvas.getBoundingClientRect();
+        
+        console.log( r );
     },
 }
 
@@ -231,6 +235,35 @@ window.onload = function()
 }
 
 
+
+
+
+var Stage = function(){}
+
+Stage.prototype = 
+{
+    children: [],
+    
+    numChildren: function()
+    {
+        return this.children.length;
+    },
+    
+    addChild: function( child )
+    {
+        
+    },
+    
+    removeChild: function( child )
+    {
+        
+    },
+    
+    contains: function( child )
+    {
+        
+    },
+}
 
 
 
