@@ -266,6 +266,22 @@ Stage.prototype =
 }
 
 
+var EventDispatcher = function()
+{
+    prototype: {
+        
+        addEventListener: function( type, listener )
+        {
+            
+        },
+        
+        removeEventListener: function( type, listener )
+        {
+            
+        },
+    }
+}
+
 
 /**
  * 
