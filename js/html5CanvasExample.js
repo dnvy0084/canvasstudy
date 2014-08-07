@@ -5,7 +5,7 @@ var CanvasApp = function()
     this.context = undefined;
     this.finalizer = null;
     
-    this.firstCase = "mouseEvent";
+    this.firstCase = "testStage";
 }
 
 CanvasApp.prototype = 
@@ -227,6 +227,110 @@ CanvasApp.prototype =
         
         console.log( r );
     },
+    
+    $eventDispatcherTest: function()
+    {
+        var e = new EventDispatcher();
+        
+        e.addEventListener( "test", function(e){ console.log(e);}, this );
+        
+        e.dispatchEvent( "test" );
+    },
+    
+    $shapeTest: function()
+    {
+        this.clear();
+        this.setTitle( "Shape Test" );
+        
+        var s = new Shape();
+        
+        s.x = 123;
+        console.log( s.x );
+        
+        s.addEventListener( "update", function( e )
+        {
+            console.log( e.type, e, this.init );
+        }, this );
+        
+        s.dispatchEvent( "update" );
+        
+        
+        s.x = 100;
+        s.y = 50;
+        
+        s.__render( this.context );
+    },
+    
+    $arcTest: function()
+    {
+        this.clear();
+        this.setTitle( "arc test" );
+        
+        this.context.save();
+        this.context.translate( 100, 100 );
+        
+        this.context.beginPath();
+        this.context.arc( 0, 0, 20, 0, 2 * Math.PI );
+        this.context.stroke();
+        
+        this.context.translate( -100, -100 );
+        this.context.restore()
+    },
+    
+    $testStage: function()
+    {
+        var stage = new Stage( this.context );
+        
+        function onEnter( e )
+        {
+            var tx = e.target.x + e.target.vx;
+            var ty = e.target.y + e.target.vy;
+            
+            if( tx < 0 ) 
+            {
+                tx = 0;
+                e.target.vx *= -1;
+            }
+            else if( tx > this.canvas.width )
+            {
+                tx = this.canvas.width;
+                e.target.vx *= -1;
+            }
+            
+            if( ty < 0 )
+            {
+                ty = 0;
+                e.target.vy *= -1;
+            }
+            else if( ty > this.canvas.height )
+            {
+                ty = this.canvas.height;
+                e.target.vy *= -1;
+            }
+            
+            e.target.x = tx;
+            e.target.y = ty;
+        }
+        
+        for( var i = 0; i < 10; i++ )
+        {
+            var s = new Shape();
+            
+            s.x = Math.random() * this.context.canvas.width;
+            s.y = Math.random() * this.context.canvas.height;
+            
+            s.vx = Math.random() * 1 + 1;
+            s.vy = Math.random() * 1 + 1;
+            
+            s.addEventListener( "enterframe", onEnter, this );
+            
+            stage.addChild( s );
+            
+        }//for
+        
+        console.log( stage, stage.numChildren );
+        
+    }//testStage
 }
 
 window.onload = function()
@@ -237,50 +341,6 @@ window.onload = function()
 
 
 
-
-var Stage = function(){}
-
-Stage.prototype = 
-{
-    children: [],
-    
-    numChildren: function()
-    {
-        return this.children.length;
-    },
-    
-    addChild: function( child )
-    {
-        
-    },
-    
-    removeChild: function( child )
-    {
-        
-    },
-    
-    contains: function( child )
-    {
-        
-    },
-}
-
-
-var EventDispatcher = function()
-{
-    prototype: {
-        
-        addEventListener: function( type, listener )
-        {
-            
-        },
-        
-        removeEventListener: function( type, listener )
-        {
-            
-        },
-    }
-}
 
 
 /**
