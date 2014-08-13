@@ -13,6 +13,13 @@ function extend( base, sub )
     }
 }
 
+function globalTolocal( r, width, height, e )
+{
+	return {
+		x: ( e.clientX - r.left ) * width / r.width,
+		y: ( e.clientY - r.top ) * height / r.height
+	} 
+}
 
 
 
@@ -46,19 +53,17 @@ EventDispatcher.prototype.removeEventListener = function( type, listener )
     }
 }
 
-EventDispatcher.prototype.dispatchEvent = function( type )
+EventDispatcher.prototype.dispatchEvent = function( e )
 {
-    if( !this.hasEventListener( type ) ) return;
+    if( !this.hasEventListener( e.type ) ) return;
     
-    var event = null,
-        e = null;
+    var event = null;
     
-    for( var i = 0; i < this.map[type].length; i++ )
+    for( var i = 0; i < this.map[e.type].length; i++ )
     {
-        event = this.map[type][i];
+        event = this.map[e.type][i];
         
-        e = { type: type, target: this };
-        
+		e.target = this;
         event.listener.apply( event.thisObj, [ e ] );
     }
 }
@@ -85,13 +90,26 @@ var Stage = function( context )
     this.fps = 60;
     this.delay = 1000 / this.fps;
     
+	this.children = [];
+    this.map = [];
+	
     this.init();
     this.enterframeID = this.startRender();
-    
-    this.map = [];
+	
+	var stage = this;
+	
+	function onStageClick( e )
+	{
+		var o = globalTolocal( 
+			context.canvas.getBoundingClientRect(), 
+			context.canvas.width, context.canvas.height, e 
+		)
+		
+		stage.dispatchEvent( { type: "click", x: o.x, y: o.y } );
+	}
+	
+	this.context.canvas.addEventListener( "click", onStageClick );
 }
-
-Stage.prototype.children = [];
 
 Stage.prototype.init = function()
 {
@@ -174,9 +192,9 @@ Stage.prototype.__render = function()
         
     for( var i = 0; i < this.children.length; i++ )
     {
-        this.children[i].dispatchEvent( "enterframe" );
+        this.children[i].dispatchEvent( { type: "enterframe" } );
         
-        if( this.children[i].__render )
+        if( this.children[i] && this.children[i].__render )
             this.children[i].__render( this.context );
     }
 }
@@ -210,7 +228,7 @@ Shape.prototype.__render = function( context )
     
     context.arc( 0, 0, 20, 0, 2 * Math.PI );
     context.fill();
-    context.stroke();
+    //context.stroke();
     
     context.translate( -this.x, -this.y );
     context.restore();

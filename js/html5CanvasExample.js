@@ -5,7 +5,7 @@ var CanvasApp = function()
     this.context = undefined;
     this.finalizer = null;
     
-    this.firstCase = "renderTest";
+    this.firstCase = "gravityTest";
 }
 
 CanvasApp.prototype = 
@@ -14,8 +14,8 @@ CanvasApp.prototype =
     /**
      *
      * initializer
-     *  canvas element를 받아 context와 canvas element를
-     *  CanvasApp instance 변수에 저장. 
+     *  canvas element瑜�諛쏆븘 context��canvas element瑜�
+     *  CanvasApp instance 蹂�닔����옣. 
      * 
      **/
     init: function( canvas )
@@ -29,7 +29,7 @@ CanvasApp.prototype =
     },
     
     /**
-     * test case function name이 포함된 listitem을 html에 추가
+     * test case function name���ы븿��listitem��html��異붽�
      * */
     makeTestCaseList: function()
     {
@@ -56,7 +56,7 @@ CanvasApp.prototype =
     },
     
     /**
-     * 왼쪽 상단에 현재 test case를 알수 있도록 title 표시
+     * �쇱そ �곷떒���꾩옱 test case瑜��뚯닔 �덈룄濡�title �쒖떆
      * */
     setTitle: function( title )
     {
@@ -70,7 +70,7 @@ CanvasApp.prototype =
     },
     
     /**
-     * 추가된 listItem click시 해당 listItem명의 함수를 호출. 
+     * 異붽���listItem click���대떦 listItem紐낆쓽 �⑥닔瑜��몄텧. 
      * */
     excuteFunc: function( funcName )
     {
@@ -90,7 +90,7 @@ CanvasApp.prototype =
     
     
     /**
-     * canvas 화면 클리어. 
+     * canvas �붾㈃ �대━�� 
      * */
     clear: function()
     {
@@ -104,7 +104,7 @@ CanvasApp.prototype =
      * 
      **/
      
-     // 예제 1.1 
+     // �덉젣 1.1 
     $helloCanvas: function()
     {
         this.clear();
@@ -260,10 +260,52 @@ CanvasApp.prototype =
         
         s.__render( this.context );
     },
+	
+	$gravityTest: function()
+	{
+		var stage = new Stage( this.context );
+		var g = 0.3;
+		var scope = this;
+		
+		function onEnter( e )
+		{
+			var b = e.target;
+			
+			b.vy += g;
+			
+			b.x += b.vx;
+			b.y += b.vy;
+			
+			if( b.y > scope.context.canvas.height )
+			{
+				stage.removeChild( b );
+				b.removeEventListener( "enterframe", onEnter );
+			}
+		}
+		
+		function onStageClick( e )
+		{
+			var b = new Shape();
+			b.x = e.x;
+			b.y = e.y;
+			b.vx = 0;
+			b.vy = 0;
+			b.addEventListener( "enterframe", onEnter );
+			
+			stage.addChild( b );
+		}
+		
+		stage.addEventListener( "click", onStageClick );
+		
+		this.finalizer = function()
+		{
+			stage.stopRender();
+		}
+	},
     
     $renderTest: function()
     {
-        var n = 500;
+        var n = 100;
         var stage = new Stage( this.context );
         
         function onEnter( e )
@@ -492,8 +534,8 @@ Clock.prototype =
  * closePath()	Creates a path from the current point back to the starting point
  * lineTo()	Adds a new point and creates a line from that point to the last specified point in the canvas
  * clip()	Clips a region of any shape and size from the original canvas
- * quadraticCurveTo()	Creates a quadratic Bézier curve
- * bezierCurveTo()	Creates a cubic Bézier curve
+ * quadraticCurveTo()	Creates a quadratic B챕zier curve
+ * bezierCurveTo()	Creates a cubic B챕zier curve
  * arc( cx, cy, radius, sAngle, eAngle, CCW )	Creates an arc/curve (used to create circles, or parts of circles)
  * arcTo()	Creates an arc/curve between two tangents
  * isPointInPath()	Returns true if the specified point is in the current path, otherwise false
