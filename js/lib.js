@@ -22,25 +22,26 @@ function extend( base, sub )
 //
 //***************************************************
 
-var EventDispatcher = function(){};
-
-EventDispatcher.prototype.map = {};
+var EventDispatcher = function()
+{
+    this.map = [];
+};
 
 EventDispatcher.prototype.addEventListener = function( type, listener, thisObj )
 {
     if( !this.hasEventListener( type ) )
         this.map[ type ] = [];
-        
+    
     this.map[ type ].push( { listener: listener, thisObj: thisObj } );
 }
 
-EventDispatcher.prototype.removeEventListener = function( type, listener, thisObj )
+EventDispatcher.prototype.removeEventListener = function( type, listener )
 {
     if( !this.hasEventListener(type) ) return;
     
     for( var i = this.map[type].length; i--; )
     {
-        if( this.map[type].listener == listener )
+        if( this.map[type][i].listener == listener )
             this.map[type].splice( i, 1 );
     }
 }
@@ -64,7 +65,7 @@ EventDispatcher.prototype.dispatchEvent = function( type )
 
 EventDispatcher.prototype.hasEventListener = function( type )
 {
-    return this.map.hasOwnProperty( type );
+    return this.map.hasOwnProperty( type ) && this.map[type].length > 0;
 }
 
 
@@ -81,13 +82,16 @@ var Stage = function( context )
     extend( EventDispatcher, Stage );
     
     this.context = context;
-    this.children = [];
     this.fps = 60;
     this.delay = 1000 / this.fps;
     
     this.init();
     this.enterframeID = this.startRender();
+    
+    this.map = [];
 }
+
+Stage.prototype.children = [];
 
 Stage.prototype.init = function()
 {
@@ -127,11 +131,18 @@ Stage.prototype.addChild = function( child )
 
 Stage.prototype.removeChild = function( child )
 {
-    var i = this.chidren.indexOf( child );
+    var i = this.children.indexOf( child );
     
     if( i == -1 ) return null;
     
     this.children.splice( i, 1 )[0];
+}
+
+Stage.prototype.getChildAt = function( index )
+{
+    if( index < 0 || index >= this.numChildren ) return null;
+    
+    return this.children[ index ];
 }
 
 Stage.prototype.contains = function( child )
@@ -151,6 +162,11 @@ Stage.prototype.startRender = function()
     this.delay );
 }
 
+Stage.prototype.stopRender = function()
+{
+    clearInterval( this.enterframeID );
+}
+
 Stage.prototype.__render = function()
 {
     this.context.clearRect( 
@@ -163,8 +179,6 @@ Stage.prototype.__render = function()
         if( this.children[i].__render )
             this.children[i].__render( this.context );
     }
-    
-    console.log( "render" );
 }
 
 
@@ -179,6 +193,8 @@ var Shape = function()
 {
     extend( EventDispatcher, Shape );
     
+    this.map = [];
+    
     this.x = 0;
     this.y = 0;
 }
@@ -188,7 +204,7 @@ Shape.prototype.__render = function( context )
     context.save();
     
     context.beginPath();
-    context.filleStyle = "#cc0000";
+    context.fillStyle = "red"
     
     context.translate( this.x, this.y );
     

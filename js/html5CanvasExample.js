@@ -5,7 +5,7 @@ var CanvasApp = function()
     this.context = undefined;
     this.finalizer = null;
     
-    this.firstCase = "testStage";
+    this.firstCase = "renderTest";
 }
 
 CanvasApp.prototype = 
@@ -261,24 +261,9 @@ CanvasApp.prototype =
         s.__render( this.context );
     },
     
-    $arcTest: function()
+    $renderTest: function()
     {
-        this.clear();
-        this.setTitle( "arc test" );
-        
-        this.context.save();
-        this.context.translate( 100, 100 );
-        
-        this.context.beginPath();
-        this.context.arc( 0, 0, 20, 0, 2 * Math.PI );
-        this.context.stroke();
-        
-        this.context.translate( -100, -100 );
-        this.context.restore()
-    },
-    
-    $testStage: function()
-    {
+        var n = 500;
         var stage = new Stage( this.context );
         
         function onEnter( e )
@@ -291,9 +276,9 @@ CanvasApp.prototype =
                 tx = 0;
                 e.target.vx *= -1;
             }
-            else if( tx > this.canvas.width )
+            else if( tx > this.context.canvas.width )
             {
-                tx = this.canvas.width;
+                tx = this.context.canvas.width;
                 e.target.vx *= -1;
             }
             
@@ -302,9 +287,9 @@ CanvasApp.prototype =
                 ty = 0;
                 e.target.vy *= -1;
             }
-            else if( ty > this.canvas.height )
+            else if( ty > this.context.canvas.height )
             {
-                ty = this.canvas.height;
+                ty = this.context.canvas.height;
                 e.target.vy *= -1;
             }
             
@@ -312,35 +297,41 @@ CanvasApp.prototype =
             e.target.y = ty;
         }
         
-        for( var i = 0; i < 10; i++ )
+        for( var i = 0; i < n; i++ )
         {
             var s = new Shape();
             
-            s.x = Math.random() * this.context.canvas.width;
-            s.y = Math.random() * this.context.canvas.height;
+            s.x = this.context.canvas.width * Math.random();
+            s.y = this.context.canvas.height * Math.random();
             
-            s.vx = Math.random() * 1 + 1;
-            s.vy = Math.random() * 1 + 1;
+            s.vx = Math.random() * 4 + 1;
+            s.vy = Math.random() * 4 + 1;
+            
+            s.name = "Shape" + i;
             
             s.addEventListener( "enterframe", onEnter, this );
-            
             stage.addChild( s );
+        }
+        
+        this.finalizer = function()
+        {
+            for( var i = stage.numChildren; i--; )
+            {
+                var child = stage.getChildAt( i );
+                stage.removeChild( child );
+                
+                child.removeEventListener( "enterframe", onEnter );
+            }
             
-        }//for
-        
-        console.log( stage, stage.numChildren );
-        
-    }//testStage
+            stage.stopRender();
+        }
+    }
 }
 
 window.onload = function()
 {
     new CanvasApp().init( document.getElementById( "canvas" ) );
 }
-
-
-
-
 
 
 /**
